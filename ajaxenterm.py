@@ -615,7 +615,7 @@ def main():
 		
 		lines = output.split("\n")
 		for line in lines[2:]:	
-			xen_domain = line[0]
+			xen_domain = re.sub(' +', ' ', line).split(' ')[0]
 			print xen_domain
 
 	else:

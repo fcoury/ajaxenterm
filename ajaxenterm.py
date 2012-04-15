@@ -611,14 +611,14 @@ def main():
 	if o.all:
 		output, error = subprocess.Popen(["xm", "list"], stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
 		print output
-	else
+	else:
 		print "starting ajaxterm"
 		at=AjaxTerm(o.cmd,o.index_file,o.domname)
 
-	    print "starting web server"
+		print "starting web server"
 		qweb.qweb_wsgi_autorun(at,ip=myname,port=int(o.port),threaded=0,log=o.log,callback_ready=None)
 
-    print "Successfully started AjaxTerm server"
+	print "Successfully started AjaxTerm server"
 	at.multi.die()
 
 if __name__ == '__main__':

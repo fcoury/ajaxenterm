@@ -612,11 +612,19 @@ def main():
 		import subprocess, re
 
 		output, error = subprocess.Popen(["xm", "list"], stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
-		
+	
+		port = int(o.port)	
 		lines = output.split("\n")
 		for line in lines[2:]:	
 			xen_domain = re.sub(' +', ' ', line).split(' ')[0]
 			print xen_domain
+
+			at=AjaxTerm(o.cmd,o.index_file,xen_domain)
+			qweb.qweb_wsgi_autorun(at,ip=myname,port=port,threaded=0,log=o.log,callback_ready=None)
+			port += 1
+			at.multi.die()
+
+			print "%s,%s" % (xen_domain,str(port-1))
 
 	else:
 		print "starting ajaxterm"

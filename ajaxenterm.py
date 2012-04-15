@@ -633,7 +633,7 @@ def main():
 						os.setuid(int(o.uid))
 					except:
 						os.setuid(pwd.getpwnam(o.uid).pw_uid)
-						
+
 				at=AjaxTerm(o.cmd,o.index_file,xen_domain)
 				qweb.qweb_wsgi_autorun(at,ip=myname,port=port,threaded=0,log=o.log,callback_ready=None)
 				port += 1
@@ -644,7 +644,7 @@ def main():
 				except:
 					pass
 				print "%s,%s" % (xen_domain,str(port))
-				print 'AjaxTerm for %s at http://%s:%s/ pid: %d' % (xen_domain,myname,o.port,pid)
+				print 'AjaxTerm for %s at http://%s:%s/ pid: %d' % (xen_domain,myname,port,pid)
 
 	else:
 		print "starting ajaxterm"

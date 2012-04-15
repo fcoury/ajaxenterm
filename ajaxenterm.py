@@ -615,17 +615,37 @@ def main():
 	
 		port = int(o.port)	
 		lines = output.split("\n")
-		for line in lines[2:]:	
+		for line in lines[2:-1]:	
 			xen_domain = re.sub(' +', ' ', line).split(' ')[0]
 			print xen_domain
+
+			pid=os.fork()
+			if pid == 0:
+				#os.setsid() ?
+				os.setpgrp()
+				nullin = file('/dev/null', 'r')
+				nullout = file('/dev/null', 'w')
+				os.dup2(nullin.fileno(), sys.stdin.fileno())
+				os.dup2(nullout.fileno(), sys.stdout.fileno())
+				os.dup2(nullout.fileno(), sys.stderr.fileno())
+				if os.getuid()==0 and o.uid:
+					try:
+						os.setuid(int(o.uid))
+					except:
+						os.setuid(pwd.getpwnam(o.uid).pw_uid)
+			else:
+				try:
+					file(o.pidfile,'w+').write(str(pid)+'\n')
+				except:
+					pass
+				print "%s,%s" % (xen_domain,str(port))
+				print 'AjaxTerm for %s at http://%s:%s/ pid: %d' % (xen_domain,myname,o.port,pid)
+				sys.exit(0)
 
 			at=AjaxTerm(o.cmd,o.index_file,xen_domain)
 			qweb.qweb_wsgi_autorun(at,ip=myname,port=port,threaded=0,log=o.log,callback_ready=None)
 			port += 1
 			at.multi.die()
-
-			print "%s,%s" % (xen_domain,str(port-1))
-
 	else:
 		print "starting ajaxterm"
 		at=AjaxTerm(o.cmd,o.index_file,o.domname)

@@ -609,6 +609,7 @@ def main():
 		print 'AjaxTerm at http://%s:%s/' % (myname,o.port)
 
 	if o.all:
+		import subprocess
 		output, error = subprocess.Popen(["xm", "list"], stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
 		print output
 	else:

@@ -636,8 +636,8 @@ def main():
 
 				at=AjaxTerm(o.cmd,o.index_file,xen_domain)
 				qweb.qweb_wsgi_autorun(at,ip=myname,port=port,threaded=0,log=o.log,callback_ready=None)
-				port += 1
 				at.multi.die()
+
 			else:
 				try:
 					file(o.pidfile,'w+').write(str(pid)+'\n')
@@ -645,6 +645,8 @@ def main():
 					pass
 				print "%s,%s" % (xen_domain,str(port))
 				print 'AjaxTerm for %s at http://%s:%s/ pid: %d' % (xen_domain,myname,port,pid)
+				
+			port += 1
 
 	else:
 		print "starting ajaxterm"

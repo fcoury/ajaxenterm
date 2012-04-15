@@ -573,6 +573,7 @@ def main():
 	parser.add_option("-x", "--xenid", dest="domid", help="ID of the Xen domain to connect to")
 	parser.add_option("-n", "--domname", dest="domname", help="Name of Xen domain to connect to")
 	parser.add_option("-b", "--bind", dest="addr", help="IP or address to bind to")
+	parser.add_option("-a", "--all", dest="all", help="starts for all Xen domains")
 
 	(o, a) = parser.parse_args()
 
@@ -606,12 +607,18 @@ def main():
 			sys.exit(0)
 	else:
 		print 'AjaxTerm at http://%s:%s/' % (myname,o.port)
-	print "starting ajaxterm"
-	at=AjaxTerm(o.cmd,o.index_file,o.domname)
-#	f=lambda:os.system('firefox http://localhost:%s/&'%o.port)
-        print "starting web server"
-	qweb.qweb_wsgi_autorun(at,ip=myname,port=int(o.port),threaded=0,log=o.log,callback_ready=None)
-        print "Successfully started AjaxTerm server"
+
+	if o.all:
+		output, error = subprocess.Popen(["xm", "list"], stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
+		print output
+	else
+		print "starting ajaxterm"
+		at=AjaxTerm(o.cmd,o.index_file,o.domname)
+
+	    print "starting web server"
+		qweb.qweb_wsgi_autorun(at,ip=myname,port=int(o.port),threaded=0,log=o.log,callback_ready=None)
+
+    print "Successfully started AjaxTerm server"
 	at.multi.die()
 
 if __name__ == '__main__':

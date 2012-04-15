@@ -573,7 +573,7 @@ def main():
 	parser.add_option("-x", "--xenid", dest="domid", help="ID of the Xen domain to connect to")
 	parser.add_option("-n", "--domname", dest="domname", help="Name of Xen domain to connect to")
 	parser.add_option("-b", "--bind", dest="addr", help="IP or address to bind to")
-	parser.add_option("-a", "--all", dest="all", help="starts for all Xen domains")
+	parser.add_option("-a", "--all", action="store_true", dest="all", default=0, help="starts for all Xen domains")
 
 	(o, a) = parser.parse_args()
 
@@ -582,31 +582,6 @@ def main():
 		myname=o.addr
 	else:
 		myname=socket.gethostname()
-
-	if o.daemon:
-		pid=os.fork()
-		if pid == 0:
-			#os.setsid() ?
-			os.setpgrp()
-			nullin = file('/dev/null', 'r')
-			nullout = file('/dev/null', 'w')
-			os.dup2(nullin.fileno(), sys.stdin.fileno())
-			os.dup2(nullout.fileno(), sys.stdout.fileno())
-			os.dup2(nullout.fileno(), sys.stderr.fileno())
-			if os.getuid()==0 and o.uid:
-				try:
-					os.setuid(int(o.uid))
-				except:
-					os.setuid(pwd.getpwnam(o.uid).pw_uid)
-		else:
-			try:
-				file(o.pidfile,'w+').write(str(pid)+'\n')
-			except:
-				pass
-			print 'AjaxTerm at http://%s:%s/ pid: %d' % (myname,o.port,pid)
-			sys.exit(0)
-	else:
-		print 'AjaxTerm at http://%s:%s/' % (myname,o.port)
 
 	if o.all:
 		import subprocess, re
@@ -645,10 +620,35 @@ def main():
 					pass
 				print "%s,%s" % (xen_domain,str(port))
 				print 'AjaxTerm for %s at http://%s:%s/ pid: %d' % (xen_domain,myname,port,pid)
-				
+
 			port += 1
 
 	else:
+		if o.daemon:
+			pid=os.fork()
+			if pid == 0:
+				#os.setsid() ?
+				os.setpgrp()
+				nullin = file('/dev/null', 'r')
+				nullout = file('/dev/null', 'w')
+				os.dup2(nullin.fileno(), sys.stdin.fileno())
+				os.dup2(nullout.fileno(), sys.stdout.fileno())
+				os.dup2(nullout.fileno(), sys.stderr.fileno())
+				if os.getuid()==0 and o.uid:
+					try:
+						os.setuid(int(o.uid))
+					except:
+						os.setuid(pwd.getpwnam(o.uid).pw_uid)
+			else:
+				try:
+					file(o.pidfile,'w+').write(str(pid)+'\n')
+				except:
+					pass
+				print 'AjaxTerm at http://%s:%s/ pid: %d' % (myname,o.port,pid)
+				sys.exit(0)
+		else:
+			print 'AjaxTerm at http://%s:%s/' % (myname,o.port)
+
 		print "starting ajaxterm"
 		at=AjaxTerm(o.cmd,o.index_file,o.domname)
 

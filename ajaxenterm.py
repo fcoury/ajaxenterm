@@ -609,9 +609,15 @@ def main():
 		print 'AjaxTerm at http://%s:%s/' % (myname,o.port)
 
 	if o.all:
-		import subprocess
+		import subprocess, re
+
 		output, error = subprocess.Popen(["xm", "list"], stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
-		print output
+		
+		lines = output.split("\n")
+		for line in lines[2:]:	
+			xen_domain = line[0]
+			print xen_domain
+
 	else:
 		print "starting ajaxterm"
 		at=AjaxTerm(o.cmd,o.index_file,o.domname)
@@ -619,8 +625,8 @@ def main():
 		print "starting web server"
 		qweb.qweb_wsgi_autorun(at,ip=myname,port=int(o.port),threaded=0,log=o.log,callback_ready=None)
 
-	print "Successfully started AjaxTerm server"
-	at.multi.die()
+		print "Successfully started AjaxTerm server"
+		at.multi.die()
 
 if __name__ == '__main__':
 	main()
